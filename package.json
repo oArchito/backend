@@ -5,14 +5,15 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-   "dev":"nodemon src/index.js"
+    "dev": "nodemon src/index.js"
   },
   "keywords": [
     "JS"
   ],
   "author": "ArchitAggarwal",
   "license": "ISC",
-   "devDependencies": {
-  "nodemon": "^3.0.1"
-}
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "prettier": "^3.6.2"
+  }
 }
