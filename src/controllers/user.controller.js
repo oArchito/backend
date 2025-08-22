@@ -1,8 +1,8 @@
   import { asynchandler }  from "../utils/async.js";
-  import { apierror } from "../utils/apierror.js";
+  import Apierror from "../utils/apierror.js";
   import { User } from "../models/user.model.js";
   import { uploadImage } from "../utils/cludinary.js";
-  import { Apiresponse } from "../utils/Apiresponse.js";
+  
 
   const register =asynchandler( async (req, res) => {
     // Registration logic here
@@ -18,24 +18,28 @@
     // return response to frontend
 
 
+        // Add these lines at the very beginning
+    console.log("req.body:", req.body);
+    console.log("req.files:", req.files);
 
-    const { fullName ,username, email, password } = req.body;
+
+    const { fullName ,username, email, password } =  req.body || {};
     console.log(req.body);
 
-    if (!fullName || !username || !email || !password) {
-      throw new apierror(400, "All fields are required");
+     if (!fullName || !username || !email || !password) {
+      throw new Apierror(400, "All fields are required");
     }
 
-    const existeduser = User.findOne({ $or: [{ email }, { username }] })
+    const existeduser =  await User.findOne({ $or: [{ email }, { username }] })
     if (existeduser) {
-      throw new apierror(400, "User already exists");
+      throw new Apierror(400, "User already exists");
     }
- 
-      const avatarlocalpath = req.body?.avatar[0]?.path
-     const coverimagelocalpath = req.body?.coverImage[0]?.path
+ const avatarlocalpath = req.files?.avatar?.[0]?.path
+const coverimagelocalpath = req.files?.coverImage?.[0]?.path
+
 
      if (!avatarlocalpath) {
-      throw new apierror(400, "Avatar is required");
+      throw new Apierror(400, "Avatar is required");
       }
 
 
@@ -43,7 +47,7 @@
       const coverImage =  await uploadImage(coverimagelocalpath);
 
       if (!avatar) {
-        throw new apierror(500, "Avatar upload failed");
+        throw new Apierror(500, "Avatar upload failed");
       }
 
 
@@ -69,7 +73,7 @@
 
 
 
-  })
+  }) 
 
 
  
