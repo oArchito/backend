@@ -6,3 +6,5 @@ class Apiresponse {
         this.data = data;
     }
 }
+
+export { Apiresponse };
