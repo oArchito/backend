@@ -1,4 +1,4 @@
-  import { asynchandler }  from ".../utils/async.util.js";
+  import { asynchandler }  from "../utils/async.js";
 
 
   const register =asynchandler( async (req, res) => {
