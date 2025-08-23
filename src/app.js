@@ -5,7 +5,7 @@ import cookies from "cookie-parser";
 
 const app = express();
 
-export default app;
+
 
 
 

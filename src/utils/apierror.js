@@ -18,7 +18,7 @@ class Apierror extends Error {
 }
 }
 
-export default Apierror;
+export { Apierror };
 
 // Usage example:
 // throw new Apierror(404, "Resource not found", [], new Error().stack);

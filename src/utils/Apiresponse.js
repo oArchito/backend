@@ -6,5 +6,4 @@ class Apiresponse {
         this.data = data;
     }
 }
-
-export { Apiresponse };
+export default Apiresponse;
