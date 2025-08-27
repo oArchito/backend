@@ -215,14 +215,129 @@ const refreshaccesstoken = asynchandler(async (req, res) => {
 
   })
 
+const changecurrentpassword = asynchandler(async (req, res) => {
+ 
+  const {oldpassword, newpassword, confpassword} = req.body
+  if(!oldpassword || !newpassword){
+    throw new Apierror(400, "All fields are required");
+  
+  }
+  if(newpassword !== confpassword){
+    throw new Apierror(400, "New password and confirm password do not match");
+  }
+
+  const user = await User.findById(req.user._id)
+
+const ispassordcorrect = await user.isPasswordMatch(oldpassword)
+ if(!ispassordcorrect){
+  throw new Apierror(400, "Old password is incorrect");
+ }
+
+  user.password = newpassword
+  await user.save({validateBeforeSave: false})
+
+  return res
+  .status(200)
+  .json(new Apiresponse(200, null, "Password changed successfully"))
+
+ 
+
+  
+});
+
+const getcurrentuser = asynchandler(async (req, res) => {
+  return res
+  .status(200)
+  .json(new Apiresponse(200, req.user, "Current user fetched successfully"))
+});
+ 
+const updateaccount = asynchandler(async (req, res) => {
+  const { fullName, email }= req.body || {}
+  
+  if(!fullName || !email){
+    throw new Apierror(400, "All fields are required");
+  }
+
+const user = await User.findByIdAndUpdate(
+  req.user._id,
+  {
+    $set: {
+      fullName,
+      email:email
+    } //mongodb ka set operator
+  },
+  {new: true}
+
+).select("-password ")
 
 
+return res
+.status(200)  
+.json(new Apiresponse(200, user, "User updated successfully"))
+});
+
+const updateuseravatar = asynchandler(async (req, res) => {
+ 
+  const avatarlocalpath = req.file?.path;
+  if(!avatarlocalpath){
+    throw new Apierror(400, "Avatar file is required");
+  }
+  const avatar = await uploadImage(avatarlocalpath);
+  if(!avatar.url){  
+    throw new Apierror(500, "Avatar upload failed");
+  }
+
+  await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        avatar: avatar.url
+      }
+    },
+    {new: true}
+  ).select("-password ")
+
+  return res  
+  .status(200)
+  .json(new Apiresponse(200, null, "User avatar updated successfully")) 
+});
+
+const updateusercoverimage = asynchandler(async(req,res)=>{
+    const coverimagelocalpath  = req.file?.path;
+  if(!coverimagelocalpath){
+    throw new Apierror(400, "CoverImage file is required");
+  }
+  const coverImage = await uploadImage(coverimagelocalpath);
+  if(!coverImage.url){  
+    throw new Apierror(500, "coverImage upload failed");
+  }
+
+  await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        coverImage: coverImage.url
+      }
+    },
+    {new: true}
+  ).select("-password ")
+
+  return res  
+  .status(200)
+  .json(new Apiresponse(200, null, "User coverImage updated successfully"))
+})  
 
 
-
-
-
-export { register, login, logout, refreshaccesstoken  };
+export { 
+   register,
+   login, 
+   logout, 
+   refreshaccesstoken,
+   changecurrentpassword, 
+   getcurrentuser, 
+   updateaccount, 
+   updateuseravatar,
+  updateusercoverimage };
 
 
  
