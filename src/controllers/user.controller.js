@@ -327,6 +327,58 @@ const updateusercoverimage = asynchandler(async(req,res)=>{
   .json(new Apiresponse(200, null, "User coverImage updated successfully"))
 })  
 
+//subscriber wala controller bna skte hai jisme sirf wo user apni details dekh paye jo usko follow krta ho
+
+const getwatchhistory = asynchandler(async (req, res) => {
+  const user = await User.aggregate([
+    {
+      $match: {
+        _id: new mongoose.Types.ObjectId(req.user._id) // Match logged-in user
+      }
+    },
+    {
+      $lookup: {
+        from: "video",                  // target collection
+        localField: "watchhistory",     // User.watchhistory (array of videoIds)
+        foreignField: "_id",            // match with Video._id
+        as: "watchhistory",             // replace watchhistory with full video docs
+        pipeline: [
+          {
+            $lookup: {
+              from: "user",             // target collection (users)
+              localField: "owner",      // Video.owner (ObjectId of User)
+              foreignField: "_id",      // match with User._id
+              as: "owner",              // result will be an array of matched User docs
+              pipeline: [
+                {
+                  $project: {           // only keep these fields from User
+                    fullName: 1,
+                    username: 1,
+                    avatar: 1
+                  }
+                }
+              ]
+            }
+          },
+          {
+            $addFields: {
+              owner: { $first: "$owner" } // flatten owner array into single object
+            }
+          }
+        ]
+      }
+    }
+  ])
+
+  return res
+    .status(200)
+    .json(new Apiresponse(
+      200,
+      user[0].watchhistory,
+      "Watch history fetched successfully"
+    ))
+});
+
 
 export { 
    register,
@@ -337,7 +389,9 @@ export {
    getcurrentuser, 
    updateaccount, 
    updateuseravatar,
-  updateusercoverimage };
+  updateusercoverimage,
+  getwatchhistory
+};
 
 
  
