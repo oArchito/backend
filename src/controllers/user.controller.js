@@ -327,6 +327,17 @@ const updateusercoverimage = asynchandler(async(req,res)=>{
   .json(new Apiresponse(200, null, "User coverImage updated successfully"))
 })  
 
+
+const getUserchannelProfile = asynchandler(async (req, res) => {
+  const { username } = req.params;
+  const user = await User.findOne({ username }).select("-password ");
+  if (!user) {
+    throw new Apierror(404, "User not found");
+  }
+  return res
+    .status(200)
+    .json(new Apiresponse(200, user, "User profile fetched successfully")); 
+});
 //subscriber wala controller bna skte hai jisme sirf wo user apni details dekh paye jo usko follow krta ho
 
 const getwatchhistory = asynchandler(async (req, res) => {
@@ -390,6 +401,7 @@ export {
    updateaccount, 
    updateuseravatar,
   updateusercoverimage,
+  getUserchannelProfile,
   getwatchhistory
 };
 
